@@ -3,6 +3,8 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Eye, EyeOff, Mail, Lock } from 'lucide-react'
+import { toast } from 'sonner'
+import Image from 'next/image'
 
 export default function LoginPage() {
   const [email, setEmail] = useState('')
@@ -13,16 +15,21 @@ export default function LoginPage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    // Mock login - in real app, this would authenticate
+    
+    if(email !== "user@email.com" && password !== "12345"){
+        toast.error("Invalid email or password");
+        return;
+    }
+    toast.success("Login successfull");
     router.push('/dashboard')
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-white to-indigo-100 flex items-center justify-center p-4">
       <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-8">
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Budget Tracking System</h1>
+          <Image src="/budget_logo.png" alt="Logo" width={300} height={300} className="mx-auto" />
           <p className="text-gray-600">Sign in to your account</p>
         </div>
 
@@ -90,7 +97,7 @@ export default function LoginPage() {
           {/* Submit Button */}
           <button
             type="submit"
-            className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors font-medium"
+            className="w-full cursor-pointer bg-[#38921e] text-white py-3 px-4 rounded-lg hover:bg-[#01501f] focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 transition-colors font-medium"
           >
             Sign In
           </button>

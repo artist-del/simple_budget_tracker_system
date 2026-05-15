@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { redirect, usePathname } from 'next/navigation'
 import { cn } from '@/lib/utils'
 import {
   LayoutDashboard,
@@ -67,7 +67,7 @@ export default function Sidebar() {
 
           {/* Logout */}
           <div className="p-4 border-t border-gray-200">
-            <button className="flex items-center w-full px-4 py-3 text-sm font-medium text-gray-600 rounded-lg hover:bg-gray-50 hover:text-gray-900 transition-colors">
+            <button className="flex cursor-pointer items-center w-full px-4 py-3 text-sm font-medium text-gray-600 rounded-lg hover:bg-gray-50 hover:text-gray-900 transition-colors" onClick={()=> redirect('/login')}>
               <LogOut className="mr-3 h-5 w-5" />
               Logout
             </button>
