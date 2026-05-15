@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Eye, EyeOff, Mail, Lock } from "lucide-react";
 import { toast } from "sonner";
 import Image from "next/image";
+import { userLogin } from "@/lib/api/user.api";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -15,12 +16,14 @@ export default function LoginPage() {
 
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    const response = await userLogin(email, password);
 
     setIsLoggedIn(true);
     setTimeout(() => {
-      if (email !== "user@email.com" && password !== "12345") {
+      if (!response.result) {
         toast.error("Invalid email or password");
         setIsLoggedIn(false);
         return;
@@ -32,7 +35,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-white to-indigo-100 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-linear-to-br from-white to-indigo-100 flex items-center justify-center p-4">
       <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-8">
         {/* Header */}
         <div className="text-center mb-8">
