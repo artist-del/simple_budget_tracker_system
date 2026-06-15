@@ -2,36 +2,50 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Eye, EyeOff, Mail, Lock } from "lucide-react";
+import { Eye, EyeOff, Mail, Lock, User } from "lucide-react";
 import { toast } from "sonner";
 import Image from "next/image";
-import { userLogin } from "@/lib/api/user.api";
+import { userApi } from "@/lib/api/user.api";
+import { UserDocument } from "@/models/user";
 
-export default function LoginPage() {
+export default function RegisterPage() {
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [rememberMe, setRememberMe] = useState(false);
   const router = useRouter();
 
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isRegistering, setIsRegistering] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const response = await userLogin(email, password);
+    setIsRegistering(true);
+    if (!firstName || !lastName || !email || !password) {
+      toast.error("Please fill in all fields");
+      setIsRegistering(false);
+      return;
+    }
 
-    setIsLoggedIn(true);
-    setTimeout(() => {
-      if (!response.result) {
-        toast.error("Invalid email or password");
-        setIsLoggedIn(false);
-        return;
-      }
-      setIsLoggedIn(false);
-      toast.success("Login successfull");
-      router.push("/dashboard");
-    }, 2000);
+    const userData: UserDocument = {
+      firstName,
+      lastName,
+      email,
+      password,
+    };
+
+    const res: any = await userApi.register(userData);
+    setIsRegistering(false);
+
+    console.log("Return: ", res);
+    if (res.result !== 0) {
+      toast.error("Check your user informations.");
+      return;
+    }
+
+    toast.success("Registration successful!");
+    router.push("/login"); // Client-side navigation - no page reload
   };
 
   return (
@@ -46,11 +60,55 @@ export default function LoginPage() {
             height={300}
             className="mx-auto"
           />
-          <p className="text-gray-600">Sign in to your account</p>
+          <p className="text-gray-600">Create your account</p>
         </div>
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-6">
+          {/* First Name */}
+          <div>
+            <label
+              htmlFor="firstName"
+              className="block text-sm font-medium text-gray-700 mb-2"
+            >
+              First Name
+            </label>
+            <div className="relative">
+              <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+              <input
+                id="firstName"
+                type="text"
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
+                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                placeholder="Enter your first name"
+                required
+              />
+            </div>
+          </div>
+
+          {/* Last Name */}
+          <div>
+            <label
+              htmlFor="lastName"
+              className="block text-sm font-medium text-gray-700 mb-2"
+            >
+              Last Name
+            </label>
+            <div className="relative">
+              <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+              <input
+                id="lastName"
+                type="text"
+                value={lastName}
+                onChange={(e) => setLastName(e.target.value)}
+                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                placeholder="Enter your last name"
+                required
+              />
+            </div>
+          </div>
+
           {/* Email */}
           <div>
             <label
@@ -89,7 +147,7 @@ export default function LoginPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="Enter your password"
+                placeholder="Create a password"
                 required
               />
               <button
@@ -102,38 +160,21 @@ export default function LoginPage() {
             </div>
           </div>
 
-          {/* Remember Me */}
-          <div className="flex items-center">
-            <input
-              id="remember-me"
-              type="checkbox"
-              checked={rememberMe}
-              onChange={(e) => setRememberMe(e.target.checked)}
-              className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-            />
-            <label
-              htmlFor="remember-me"
-              className="ml-2 block text-sm text-gray-700"
-            >
-              Remember me
-            </label>
-          </div>
-
           {/* Submit Button */}
-          {isLoggedIn ? (
+          {isRegistering ? (
             <button
               type="button"
               className="w-full cursor-progress bg-[#01501f] text-white py-3 px-4 rounded-lg focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 transition-colors font-medium"
               disabled={true}
             >
-              Signing In...
+              Creating Account...
             </button>
           ) : (
             <button
               type="submit"
               className="w-full cursor-pointer bg-[#38921e] text-white py-3 px-4 rounded-lg hover:bg-[#01501f] focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 transition-colors font-medium"
             >
-              Sign In
+              Sign Up
             </button>
           )}
         </form>
@@ -141,9 +182,9 @@ export default function LoginPage() {
         {/* Footer */}
         <div className="mt-8 text-center">
           <p className="text-sm text-gray-600">
-            Don't have an account?{" "}
+            Already have an account?{" "}
             <button
-              onClick={() => router.push("/register")}
+              onClick={() => router.push("/login")}
               className="font-medium text-blue-600 hover:text-blue-500"
             >
               Sign in
