@@ -1,9 +1,6 @@
 import { WebResult } from "@/lib/WebResult";
 import userService from "../../../../backend/services/userService"
 
-
-
-
 export async function POST(request: Request){
     try{
         const data = await request.json();
@@ -11,10 +8,10 @@ export async function POST(request: Request){
         return Response.json(result);
     }catch(error: any){
         console.log("Registration error", error);
-        return new WebResult(
+        return Response.json(new WebResult(
             error.message,
             1
-        )
+        ))
     }
 }
 
