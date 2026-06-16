@@ -41,6 +41,40 @@ const userService = {
                 1
             )
         }
+    },
+    login: async(user: any)=>{
+        try{
+
+            const foundUser = await User.findOne({email: user.email}).select("+password");
+
+            if(!foundUser){
+                return new WebResult(
+                    "User not found",
+                    1
+                )
+            }
+
+            const isMatch = await bcrypt.compare(user.password, foundUser.password);
+
+            if(!isMatch){
+                return new WebResult(
+                    "Invalid password",
+                    1
+                )
+            }
+
+            return new WebResult(
+                "Login successful",
+                0,
+                foundUser
+            )
+
+        }catch(error: any){
+            return new WebResult(
+                error.message,
+                1
+            )
+        }
     }
 }
 

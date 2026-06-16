@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { Eye, EyeOff, Mail, Lock } from "lucide-react";
 import { toast } from "sonner";
 import Image from "next/image";
-import { userLogin } from "@/lib/api/user.api";
+import { userApi, userLogin } from "@/lib/api/user.api";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -18,20 +18,20 @@ export default function LoginPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    const response = await userLogin(email, password);
-
     setIsLoggedIn(true);
-    setTimeout(() => {
-      if (!response.result) {
-        toast.error("Invalid email or password");
-        setIsLoggedIn(false);
-        return;
-      }
-      setIsLoggedIn(false);
-      toast.success("Login successfull");
-      router.push("/dashboard");
-    }, 2000);
+    const data = {
+      email,
+      password,
+    };
+    const res = await userApi.login(data);
+
+    setIsLoggedIn(false);
+    if (res.result !== 0) {
+      toast.error(res.message);
+      return;
+    }
+    toast.success("Login successfull");
+    router.push("/dashboard");
   };
 
   return (
